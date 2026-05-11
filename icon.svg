@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0F0F11"/>
+  <!-- Card shadow -->
+  <rect x="128" y="158" width="256" height="196" rx="28" fill="#000" opacity="0.4"/>
+  <!-- Card back -->
+  <rect x="136" y="150" width="256" height="196" rx="24" fill="#18181C" stroke="#2A2A30" stroke-width="2"/>
+  <!-- Amber accent line -->
+  <rect x="136" y="150" width="6" height="196" rx="3" fill="#E8A020"/>
+  <!-- F letterform -->
+  <text x="268" y="272" text-anchor="middle" dominant-baseline="middle"
+    font-family="Georgia, serif" font-size="112" font-weight="700"
+    fill="#E8A020">F</text>
+  <!-- Subtle glow -->
+  <rect x="136" y="150" width="256" height="196" rx="24" fill="none"
+    stroke="#E8A020" stroke-width="1.5" opacity="0.25"/>
+</svg>
