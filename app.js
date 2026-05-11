@@ -565,10 +565,40 @@ async function finishSession() {
 // ─────────────────────────────────────────────────────
 // INSTALL PROMPT
 // ─────────────────────────────────────────────────────
+function isStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isMobileDevice() {
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function showInstallFallback() {
+  if (deferredPrompt || isStandaloneMode() || !isMobileDevice()) return;
+
+  const banner = document.getElementById('install-banner');
+  const textEl = banner.querySelector('.install-text span:last-child');
+  const btn = document.getElementById('install-btn');
+  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  if (textEl) {
+    textEl.textContent = isiOS
+      ? 'Install via Safari: Share → Add to Home Screen'
+      : 'Install via Chrome menu if prompt does not appear';
+  }
+  btn.textContent = 'How to install';
+  banner.classList.remove('hidden');
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('install-banner').classList.remove('hidden');
+  const banner = document.getElementById('install-banner');
+  const textEl = banner.querySelector('.install-text span:last-child');
+  const btn = document.getElementById('install-btn');
+  if (textEl) textEl.textContent = 'Install FlipIQ for offline use';
+  btn.textContent = 'Install';
+  banner.classList.remove('hidden');
 });
 
 window.addEventListener('appinstalled', () => {
@@ -577,14 +607,24 @@ window.addEventListener('appinstalled', () => {
 });
 
 document.getElementById('install-btn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  if (outcome === 'accepted') {
-    document.getElementById('install-banner').classList.add('hidden');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (outcome === 'accepted') {
+      document.getElementById('install-banner').classList.add('hidden');
+    }
+    return;
   }
+
+  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const message = isiOS
+    ? 'On iPhone, open this site in Safari, tap Share, then "Add to Home Screen".'
+    : 'In Chrome, open the browser menu (⋮) and tap "Add to Home screen" or "Install app".';
+  alert(message);
 });
+
+setTimeout(showInstallFallback, 2500);
 
 // ─────────────────────────────────────────────────────
 // OFFLINE INDICATOR

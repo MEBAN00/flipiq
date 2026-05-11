@@ -4,7 +4,7 @@
    for Google Fonts, network-fallback for everything else.
 ═══════════════════════════════════════════════════════ */
 
-const CACHE_NAME    = 'flipiq-v6';
+const CACHE_NAME    = 'flipiq-v7';
 const FONTS_CACHE   = 'flipiq-fonts-v1';
 
 const APP_SHELL = [
