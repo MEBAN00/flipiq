@@ -1,5 +1,5 @@
 {
-  "id": "/flipiq/",
+  "id": "/",
   "name": "FlipIQ — Smart Flashcards",
   "short_name": "FlipIQ",
   "description": "Master concepts with offline flashcards. Progress saved locally.",
@@ -9,14 +9,11 @@
   "orientation": "portrait",
   "background_color": "#0F0F11",
   "theme_color": "#0F0F11",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
     {
       "src": "./icon-192.png",
       "sizes": "192x192",
@@ -28,6 +25,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "FlipIQ home screen showing flashcard decks"
+    },
+    {
+      "src": "./screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FlipIQ desktop view with all flashcard decks"
     }
   ]
 }
