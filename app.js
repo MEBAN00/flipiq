@@ -581,10 +581,13 @@ function showInstallFallback() {
   const btn = document.getElementById('install-btn');
   const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isAndroid = /android/i.test(navigator.userAgent);
+  const isChromeIOS = isiOS && /CriOS/i.test(navigator.userAgent);
 
   if (textEl) {
-    if (isiOS) {
-      textEl.textContent = 'Install via Safari: Share → Add to Home Screen';
+    if (isChromeIOS) {
+      textEl.textContent = 'To install: tap ⋯ menu → Add to Home Screen';
+    } else if (isiOS) {
+      textEl.textContent = 'To install: tap Share ↑ → Add to Home Screen';
     } else if (isAndroid) {
       textEl.textContent = 'Install via Chrome menu ⋮ → Add to Home Screen';
     } else {
@@ -623,9 +626,15 @@ document.getElementById('install-btn').addEventListener('click', async () => {
   }
 
   const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const message = isiOS
-    ? 'On iPhone, open this site in Safari, tap Share, then "Add to Home Screen".'
-    : 'In Chrome, open the browser menu (⋮) and tap "Add to Home screen" or "Install app".';
+  const isChromeIOS = isiOS && /CriOS/i.test(navigator.userAgent);
+  let message;
+  if (isChromeIOS) {
+    message = 'In Chrome on iPhone:\n1. Tap the ⋯ (three dots) menu\n2. Tap "Add to Home Screen"';
+  } else if (isiOS) {
+    message = 'On iPhone in Safari:\n1. Tap the Share button (↑)\n2. Scroll down and tap "Add to Home Screen"';
+  } else {
+    message = 'In Chrome:\n1. Tap the menu (⋮)\n2. Tap "Add to Home Screen" or "Install app"';
+  }
   alert(message);
 });
 
