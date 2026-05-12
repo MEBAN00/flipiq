@@ -276,39 +276,39 @@ class FlipIQDB {
         }
       };
 
-      req.onsuccess  = (e) => { this.db = e.target.result; resolve(); };
-      req.onerror    = ()  => reject(req.error);
+      req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+      req.onerror = () => reject(req.error);
     });
   }
 
   async getProgress(deckId) {
     await this.ready;
     return new Promise((resolve) => {
-      const tx  = this.db.transaction('progress', 'readonly');
+      const tx = this.db.transaction('progress', 'readonly');
       const req = tx.objectStore('progress').get(deckId);
       req.onsuccess = () => resolve(req.result || null);
-      req.onerror   = () => resolve(null);
+      req.onerror = () => resolve(null);
     });
   }
 
   async saveProgress(deckId, data) {
     await this.ready;
     return new Promise((resolve) => {
-      const tx     = this.db.transaction('progress', 'readwrite');
+      const tx = this.db.transaction('progress', 'readwrite');
       const record = { deckId, ...data, lastPlayed: Date.now() };
-      const req    = tx.objectStore('progress').put(record);
+      const req = tx.objectStore('progress').put(record);
       req.onsuccess = () => resolve(record);
-      req.onerror   = () => resolve(null);
+      req.onerror = () => resolve(null);
     });
   }
 
   async getAllProgress() {
     await this.ready;
     return new Promise((resolve) => {
-      const tx  = this.db.transaction('progress', 'readonly');
+      const tx = this.db.transaction('progress', 'readonly');
       const req = tx.objectStore('progress').getAll();
       req.onsuccess = () => resolve(req.result || []);
-      req.onerror   = () => resolve([]);
+      req.onerror = () => resolve([]);
     });
   }
 }
@@ -319,12 +319,12 @@ class FlipIQDB {
 const db = new FlipIQDB();
 
 const state = {
-  currentDeck:      null,
+  currentDeck: null,
   currentCardIndex: 0,
-  isFlipped:        false,
-  correct:          0,
-  wrong:            0,
-  cardOrder:        [],
+  isFlipped: false,
+  correct: 0,
+  wrong: 0,
+  cardOrder: [],
 };
 
 let deferredPrompt = null;
@@ -384,10 +384,10 @@ async function renderHome() {
 
   const list = document.getElementById('deck-list');
   list.innerHTML = DECKS.map(deck => {
-    const prog     = progressMap[deck.id] || null;
-    const best     = prog ? prog.bestScore : null;
+    const prog = progressMap[deck.id] || null;
+    const best = prog ? prog.bestScore : null;
     const attempts = prog ? prog.totalAttempts : 0;
-    const attStr   = attempts > 0
+    const attStr = attempts > 0
       ? ` · ${attempts} attempt${attempts > 1 ? 's' : ''}`
       : '';
 
@@ -436,12 +436,12 @@ function startDeck(deckId) {
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
 
-  state.currentDeck      = deck;
-  state.cardOrder        = indices;
+  state.currentDeck = deck;
+  state.cardOrder = indices;
   state.currentCardIndex = 0;
-  state.isFlipped        = false;
-  state.correct          = 0;
-  state.wrong            = 0;
+  state.isFlipped = false;
+  state.correct = 0;
+  state.wrong = 0;
 
   document.getElementById('study-deck-title').textContent = deck.title;
   document.documentElement.style.setProperty('--current-deck-color', deck.color);
@@ -452,13 +452,13 @@ function startDeck(deckId) {
 
 function renderCard() {
   const { currentDeck, currentCardIndex, cardOrder } = state;
-  const card  = currentDeck.cards[cardOrder[currentCardIndex]];
+  const card = currentDeck.cards[cardOrder[currentCardIndex]];
   const total = cardOrder.length;
 
   document.getElementById('card-question').textContent = card.q;
-  document.getElementById('card-answer').textContent   = card.a;
+  document.getElementById('card-answer').textContent = card.a;
   document.getElementById('progress-text').textContent = `${currentCardIndex + 1} / ${total}`;
-  document.getElementById('progress-bar').style.width  = `${(currentCardIndex / total) * 100}%`;
+  document.getElementById('progress-bar').style.width = `${(currentCardIndex / total) * 100}%`;
 
   // Reset flip
   const flashcard = document.getElementById('flashcard');
@@ -478,7 +478,7 @@ function flipCard() {
   state.isFlipped = !state.isFlipped;
 
   const actionBtns = document.getElementById('action-buttons');
-  const tapHint    = document.querySelector('.tap-hint');
+  const tapHint = document.querySelector('.tap-hint');
 
   if (state.isFlipped) {
     actionBtns.classList.remove('hidden');
@@ -491,7 +491,7 @@ function flipCard() {
 
 function markCard(isCorrect) {
   if (isCorrect) state.correct++;
-  else           state.wrong++;
+  else state.wrong++;
 
   updateScoreTrack();
 
@@ -505,7 +505,7 @@ function markCard(isCorrect) {
 
 function updateScoreTrack() {
   document.getElementById('score-correct').textContent = `${state.correct} correct`;
-  document.getElementById('score-wrong').textContent   = `${state.wrong} wrong`;
+  document.getElementById('score-wrong').textContent = `${state.wrong} wrong`;
 }
 
 // ─────────────────────────────────────────────────────
@@ -513,37 +513,37 @@ function updateScoreTrack() {
 // ─────────────────────────────────────────────────────
 async function finishSession() {
   const { correct, wrong, currentDeck } = state;
-  const total    = correct + wrong;
+  const total = correct + wrong;
   const scorePct = total > 0 ? Math.round((correct / total) * 100) : 0;
 
   // Load existing progress and compute new best
-  const existing  = await db.getProgress(currentDeck.id);
-  const prevBest  = existing ? existing.bestScore : -1;
-  const newBest   = Math.max(prevBest, scorePct);
-  const attempts  = existing ? existing.totalAttempts + 1 : 1;
+  const existing = await db.getProgress(currentDeck.id);
+  const prevBest = existing ? existing.bestScore : -1;
+  const newBest = Math.max(prevBest, scorePct);
+  const attempts = existing ? existing.totalAttempts + 1 : 1;
 
   await db.saveProgress(currentDeck.id, {
-    bestScore:     newBest,
-    lastScore:     scorePct,
+    bestScore: newBest,
+    lastScore: scorePct,
     totalAttempts: attempts,
   });
 
   // Populate results UI
   document.getElementById('results-deck-name').textContent = currentDeck.title;
-  document.getElementById('results-score').textContent     = scorePct + '%';
-  document.getElementById('stat-correct').textContent      = correct;
-  document.getElementById('stat-wrong').textContent        = wrong;
-  document.getElementById('stat-total').textContent        = total;
-  document.getElementById('results-icon').textContent      =
+  document.getElementById('results-score').textContent = scorePct + '%';
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('results-icon').textContent =
     scorePct >= 80 ? '🏆' : scorePct >= 60 ? '👍' : '📚';
 
   // Best score note
   const noteEl = document.getElementById('best-score-note');
   if (scorePct > prevBest && prevBest >= 0) {
-    noteEl.textContent   = `🎉 New personal best! (was ${prevBest}%)`;
+    noteEl.textContent = `🎉 New personal best! (was ${prevBest}%)`;
     noteEl.style.display = 'block';
   } else if (prevBest >= 0) {
-    noteEl.textContent   = `Personal best: ${newBest}%`;
+    noteEl.textContent = `Personal best: ${newBest}%`;
     noteEl.style.display = 'block';
   } else {
     noteEl.style.display = 'none';
@@ -574,17 +574,22 @@ function isMobileDevice() {
 }
 
 function showInstallFallback() {
-  if (deferredPrompt || isStandaloneMode() || !isMobileDevice()) return;
+  if (deferredPrompt || isStandaloneMode()) return;
 
   const banner = document.getElementById('install-banner');
   const textEl = banner.querySelector('.install-text span:last-child');
   const btn = document.getElementById('install-btn');
   const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
 
   if (textEl) {
-    textEl.textContent = isiOS
-      ? 'Install via Safari: Share → Add to Home Screen'
-      : 'Install via Chrome menu if prompt does not appear';
+    if (isiOS) {
+      textEl.textContent = 'Install via Safari: Share → Add to Home Screen';
+    } else if (isAndroid) {
+      textEl.textContent = 'Install via Chrome menu ⋮ → Add to Home Screen';
+    } else {
+      textEl.textContent = 'Install FlipIQ from your browser\'s address bar';
+    }
   }
   btn.textContent = 'How to install';
   banner.classList.remove('hidden');
@@ -624,7 +629,7 @@ document.getElementById('install-btn').addEventListener('click', async () => {
   alert(message);
 });
 
-setTimeout(showInstallFallback, 2500);
+setTimeout(showInstallFallback, 4000);
 
 // ─────────────────────────────────────────────────────
 // OFFLINE INDICATOR
@@ -635,7 +640,7 @@ function syncOnlineStatus() {
     ? badge.classList.add('hidden')
     : badge.classList.remove('hidden');
 }
-window.addEventListener('online',  syncOnlineStatus);
+window.addEventListener('online', syncOnlineStatus);
 window.addEventListener('offline', syncOnlineStatus);
 syncOnlineStatus();
 
@@ -652,7 +657,7 @@ document.getElementById('btn-wrong').addEventListener('click', () => markCard(fa
 
 document.getElementById('back-btn').addEventListener('click', renderHome);
 document.getElementById('btn-retry').addEventListener('click', () => startDeck(state.currentDeck.id));
-document.getElementById('btn-home').addEventListener('click',  renderHome);
+document.getElementById('btn-home').addEventListener('click', renderHome);
 
 // ─────────────────────────────────────────────────────
 // SERVICE WORKER REGISTRATION
@@ -661,7 +666,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('./sw.js')
-      .then(reg  => console.log('[FlipIQ] SW registered, scope:', reg.scope))
+      .then(reg => console.log('[FlipIQ] SW registered, scope:', reg.scope))
       .catch(err => console.warn('[FlipIQ] SW registration failed:', err));
   });
 }

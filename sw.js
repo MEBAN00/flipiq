@@ -4,8 +4,8 @@
    for Google Fonts, network-fallback for everything else.
 ═══════════════════════════════════════════════════════ */
 
-const CACHE_NAME    = 'flipiq-v7';
-const FONTS_CACHE   = 'flipiq-fonts-v1';
+const CACHE_NAME = 'flipiq-v8';
+const FONTS_CACHE = 'flipiq-fonts-v1';
 
 const APP_SHELL = [
   './',
@@ -39,7 +39,7 @@ self.addEventListener('activate', (event) => {
       Promise.all(
         keys
           .filter((key) => key !== CACHE_NAME && key !== FONTS_CACHE)
-          .map((key)  => {
+          .map((key) => {
             console.log('[SW] Deleting old cache:', key);
             return caches.delete(key);
           })
@@ -96,9 +96,9 @@ async function cacheFirst(request, cacheName) {
 }
 
 async function staleWhileRevalidate(request, cacheName) {
-  const cache    = await caches.open(cacheName);
-  const cached   = await cache.match(request);
-  const network  = fetch(request)
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const network = fetch(request)
     .then((response) => {
       if (response.ok) cache.put(request, response.clone());
       return response;
